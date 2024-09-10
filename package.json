@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "element-plus": "^2.8.2",
     "speak-tts": "^2.0.8",
     "vue": "^3.4.29",
     "vue-audio-visual": "^3.0.8"
