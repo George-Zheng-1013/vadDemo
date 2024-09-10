@@ -1,0 +1,58 @@
+@import './base.css';
+
+#app {
+  width: 100%;
+  margin: 0;
+  font-weight: normal;
+  height: 100%;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {}
+
+html,
+body {
+  height: 100%;
+  margin: 0%;
+  padding: 10px;
+  background-color: #F1F3F5;
+}
+
+.parent {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+  height: 100%;
+}
+.div2 { grid-area: 2 / 1 / 4 / 2; }
+.div3 { grid-area: 4 / 1 / 6 / 2; }
+.divTtsBack { grid-area: 2 / 2 / 6 / 5; }
+.divTts { grid-area: 5 / 2 / 6 / 5; }
+.newRoleAudioPlayer { grid-area: 2 / 5 / 4 / 6; }
+.newRoleAudioPlayerVad { grid-area: 4 / 5 / 6 / 6; }
+#audioPlayerBack {
+    padding: 12.5px 15px;
+    border: 0;
+    border-radius: 40px;
+    background-color: white;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    margin-bottom: 5px;
+    z-index: 1;
+    width: 100%;
+}
