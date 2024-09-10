@@ -74,7 +74,6 @@ export default {
     font-weight: normal;
     font-family: Arial, Helvetica, sans-serif;
     color: #5C5C5D;
-    resize: none;
 }
 select {
   margin-bottom: 10px;

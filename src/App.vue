@@ -1,7 +1,8 @@
 <script setup>
 import vad from '../src/vad.vue'
 import tts from '../src/components/tts.vue'
-import audioRecorder from './components/audioRecorder.vue';
+import audioRecorder from './components/audioRecorder.vue'
+import fileUpload from './components/fileUpload.vue'
 </script>
 
 <template>
@@ -12,12 +13,13 @@ import audioRecorder from './components/audioRecorder.vue';
     <vad/>
     <tts/>
     <audioRecorder/>
+    <fileUpload/>
   </div>
 </template>
 
 <style scoped>
 .div1 {
-  grid-area: 1 / 1 / 2 / 6;
+  grid-area: 1 / 1 / 2 / 3;
   display: flex;
   align-items: flex-end;
 }

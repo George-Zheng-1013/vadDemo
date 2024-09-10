@@ -1,11 +1,4 @@
 <template>
-    <!-- <div class="div3">
-        <div class="roundedRectangle">
-            <p id="newRole">新建说话人</p>
-            <button @click="startRecording" class="vadButton" id="startRecordingButton">开始录音</button><br>
-            <button @click="stopRecording" class="vadButton" id="stopRecordingButton">停止录音</button>
-        </div>
-    </div> -->
     <div class="newRoleAudioPlayerVad" id="audioPlayerBack">
         <p id="inputAudio">对话音频</p>
         <audio ref="audioPlayerVad" controls></audio>
