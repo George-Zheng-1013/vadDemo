@@ -1,7 +1,7 @@
 <template>
     <el-upload
         class="upload-demo"
-        action="http://127.0.0.1:5000"
+        action="http://127.0.0.1:5000/input_audio"
         :show-file-list="false"
         :on-success="handleSuccess"
         :before-upload="beforeUpload"
