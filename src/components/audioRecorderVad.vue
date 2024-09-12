@@ -2,7 +2,7 @@
     <div class="newRoleAudioPlayerVad" id="audioPlayerBack">
         <p id="inputAudio">对话音频</p>
         <audio ref="audioPlayerVad" controls></audio>
-        <!-- <av-line :line-width="2" line-color="lime" :src="audioUrl"></av-line> -->
+        <a ref="downloadLink" style="display: none;">下载音频</a>
     </div>
 </template>
 
@@ -12,21 +12,26 @@ import { ref } from 'vue';
 export default {
     setup() {
         const audioPlayerVad = ref(null);
+        const downloadLink = ref(null);
         let mediaRecorder;
         let audioChunks = [];
 
         async function startRecording() {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mp4' });
 
             mediaRecorder.ondataavailable = (event) => {
                 audioChunks.push(event.data);
             };
 
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
-                const audioUrl = URL.createObjectURL(audioBlob);
-                audioPlayerVad.value.src = audioUrl;
+                const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
+                const url = URL.createObjectURL(audioBlob);
+                audioPlayerVad.value.src = url;
+                downloadLink.value.href = url;
+                downloadLink.value.download = 'audioVad.m4a';
+                downloadLink.value.style.display = 'block';
+                downloadLink.value.textContent = '下载音频';
                 audioChunks = [];
             };
 
@@ -43,6 +48,7 @@ export default {
             startRecording,
             stopRecording,
             audioPlayerVad,
+            downloadLink
         };
     },
 };

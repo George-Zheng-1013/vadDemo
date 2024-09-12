@@ -42,10 +42,16 @@ body {
 .div2 { grid-area: 2 / 1 / 4 / 2; }
 .div3 { grid-area: 4 / 1 / 6 / 2; }
 .divTtsBack { grid-area: 2 / 2 / 6 / 5; }
-.divTts { grid-area: 5 / 2 / 6 / 5; }
-.newRoleAudioPlayer { grid-area: 2 / 5 / 4 / 6; }
-.newRoleAudioPlayerVad { grid-area: 4 / 5 / 6 / 6; }
+.divTts { grid-area: 1 / 4 / 2 / 6; }
+.newRoleAudioPlayer { grid-area: 4 / 5 / 6 / 6; }
+.newRoleAudioPlayerVad { grid-area: 2 / 5 / 4 / 6; }
 .classFileUpload { grid-area: 1 / 4 / 2 / 6; }
+.diaArea { 
+  grid-area: 2 / 2 / 5 / 5; 
+  position: relative;
+  z-index: 2;
+  padding: 12.5px;
+}
 #audioPlayerBack {
     padding: 12.5px 15px;
     border: 0;

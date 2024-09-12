@@ -3,6 +3,7 @@ import vad from '../src/vad.vue'
 import tts from '../src/components/tts.vue'
 import audioRecorder from './components/audioRecorder.vue'
 import fileUpload from './components/fileUpload.vue'
+import dialogArea from './components/dialogArea.vue'
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import fileUpload from './components/fileUpload.vue'
     <div class="div1">
       <p id="header">实时说话检测</p>
     </div>
+    <dialogArea/>
     <vad/>
     <tts/>
     <audioRecorder/>

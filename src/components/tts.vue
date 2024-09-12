@@ -1,26 +1,34 @@
 <template>
-    <div class="divTtsBack">
-        <div class="divTts">
-            <textarea type="text" v-model="textInput" id="text-input" placeholder="输入要朗读的文本"></textarea>
-            <select v-model="selectedVoice">
-                <option v-for="(voice, index) in voices" :key="index" :value="index">
-                    {{ voice.name }} ({{ voice.lang }})
-                </option>
-            </select>
-            <button @click="speak">朗读</button>
-        </div>
-    </div>
+  <div class="divTtsBack">
+    <input type="text" v-model="textInput" id="text-input" placeholder="输入要朗读的文本"></input>
+  </div>
+  <div class="divTts">
+    <select v-model="selectedVoice">
+      <option v-for="(voice, index) in voices" :key="index" :value="index">
+        {{ voice.name }} ({{ voice.lang }})
+      </option>
+    </select>
+    <button @click="speak">朗读</button>
+  </div>
+  <el-button v-on:click="sendMessage" type="primary" :icon="Edit" id="sendMessageBut">发送</el-button>
 </template>
 
 <script>
+import eventBus from '@/eventBus';
+import {Edit} from '@element-plus/icons-vue'
 export default {
+  components:{
+    Edit,
+  },
+
   data() {
     return {
-      textInput: '',
+      textInput:'',
       voices: [],
-      selectedVoice: null
+      selectedVoice: null,
     };
   },
+  
   mounted() {
     this.populateVoiceList();
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
@@ -28,6 +36,9 @@ export default {
     }
   },
   methods: {
+    sendMessage() {
+      eventBus.emit('input-event', { message: this.textInput });
+    },
     populateVoiceList() {
       this.voices = window.speechSynthesis.getVoices();
       if (this.voices.length > 0) {
@@ -50,37 +61,45 @@ export default {
 
 <style>
 .divTtsBack {
-    padding: 12.5px 15px;
-    border: 0;
-    border-radius: 40px;
-    background-color: white;
-    transition: all 0.5s;
-    -webkit-transition: all 0.5s;
-    margin-bottom: 5px;
-    z-index: 1;
+  padding: 12.5px 15px;
+  border: 0;
+  border-radius: 40px;
+  background-color: white;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  margin-bottom: 5px;
+  z-index: 1;
 }
+
 #text-input {
-    position: absolute;
-    padding: 12.5px 15px;
-    border: 0;
-    border-radius: 25px;
-    background-color: #E5E7E9;
-    transition: all 0.5s;
-    top: 700px;
-    z-index: 2;
-    height: 190px;
-    width: 955px;
-    font-size: 16px;
-    font-weight: normal;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #5C5C5D;
+  position: absolute;
+  padding: 12.5px 15px;
+  border: 0;
+  border-radius: 25px;
+  background-color: #E5E7E9;
+  transition: all 0.5s;
+  top: 700px;
+  z-index: 2;
+  height: 190px;
+  width: 50%;
+  font-size: 16px;
+  font-weight: normal;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #5C5C5D;
 }
+
 select {
   margin-bottom: 10px;
   padding: 5px;
   width: 320px;
 }
+
 button {
   padding: 5px 10px;
+}
+#sendMessageBut {
+  position:relative;
+  z-index: 2;
+  grid-area: 5 / 4 / 6 / 5;
 }
 </style>
