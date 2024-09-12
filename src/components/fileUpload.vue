@@ -2,7 +2,7 @@
     <el-upload
         class="upload-demo"
         action="http://127.0.0.1:5000/input_audio"
-        :show-file-list="false"
+        :show-file-list="true"
         :on-success="handleSuccess"
         :before-upload="beforeUpload"
         name="file">
@@ -15,6 +15,7 @@ export default {
     methods: {
         handleSuccess(response, file, fileList) {
             // 文件上传成功的回调
+            console.log("Upload successful,");
             console.log(response);
         },
         beforeUpload(file) {
