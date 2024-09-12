@@ -5,7 +5,7 @@
         :show-file-list="false"
         :on-success="handleSuccess"
         :before-upload="beforeUpload"
-        name="audio">
+        name="file">
         <el-button size="small" type="primary">点击上传</el-button>
     </el-upload>
 </template>
