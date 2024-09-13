@@ -1,6 +1,6 @@
 <template>
   <div class="divTtsBack">
-    <input type="text" v-model="textInput" id="text-input" placeholder="输入要朗读的文本"></input>
+    <input type="text" v-model="textInput" class="text-input" placeholder="输入要发送的文本"></input>
   </div>
   <div class="divTts">
     <select v-model="selectedVoice">
@@ -10,12 +10,15 @@
     </select>
     <button @click="speak">朗读</button>
   </div>
-  <el-button v-on:click="sendMessage" type="primary" :icon="Edit" id="sendMessageBut">发送</el-button>
+  <el-button v-on:click="sendMessage" id="sendMessageBut" style="width: 5em;" round>
+    <el-icon><Edit/></el-icon>
+    <span>发送</span>
+  </el-button>
 </template>
 
 <script>
 import eventBus from '@/eventBus';
-import {Edit} from '@element-plus/icons-vue'
+import {Edit, Microphone} from '@element-plus/icons-vue'
 export default {
   components:{
     Edit,
@@ -71,7 +74,7 @@ export default {
   z-index: 1;
 }
 
-#text-input {
+.text-input {
   position: absolute;
   padding: 12.5px 15px;
   border: 0;
@@ -97,9 +100,11 @@ select {
 button {
   padding: 5px 10px;
 }
-#sendMessageBut {
+#sendMessageBut,#sendAudioBut {
   position:relative;
   z-index: 2;
   grid-area: 5 / 4 / 6 / 5;
+  transform: translateX(225px);
 }
+.text-input { grid-area: 2 / 2 / 6 / 5; }
 </style>

@@ -6,7 +6,7 @@
         :on-success="handleSuccess"
         :before-upload="beforeUpload"
         name="file">
-        <el-button size="small" type="primary">点击上传</el-button>
+        <el-button size="small" type="primary" id="sendAudioBut">点击上传</el-button>
     </el-upload>
 </template>
 

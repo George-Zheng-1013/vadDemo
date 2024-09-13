@@ -1,17 +1,18 @@
 <template>
     <div class="diaArea">
-        <p>hello</p>
-        <p>{{ receivedMessage }}</p>
+        <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
+            <li v-for="(message, index) in messages" class="infinite-list-item">{{ message.message }}</li>
+        </ul>
     </div>
 </template>
 
 <script>
-import {
-    Delete,
-    EditPen,
-    Microphone,
-} from '@element-plus/icons-vue'
 import eventBus from '@/eventBus'
+import { ref } from 'vue'
+const count = ref(0)
+const load = () => {
+    count.value += 2
+}
 
 export default {
     created() {
@@ -26,15 +27,36 @@ export default {
 
     data() {
         return {
-            receivedMessage: '',
+            messages: [],
         };
     },
     methods: {
         handleCustomEvent(payload) {
-            this.receivedMessage = payload.message;
+            this.messages.push(payload);
         }
     },
 };
 </script>
 
-<style></style>
+<style>
+.infinite-list {
+    height: 90%;
+    list-style: none;
+    padding-left: 0px;
+    grid-area: 2 / 2 / 5 / 5;
+}
+
+.infinite-list .infinite-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    background: var(--el-color-primary-light-9);
+    margin: 10px;
+    color: var(--el-color-primary);
+}
+
+.infinite-list .infinite-list-item+.list-item {
+    margin-top: 10px;
+}
+</style>
