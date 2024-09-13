@@ -1,17 +1,28 @@
 <template>
-    <el-upload
-        class="upload-demo"
-        action="http://127.0.0.1:5000/input_audio"
-        :show-file-list="true"
-        :on-success="handleSuccess"
-        :before-upload="beforeUpload"
-        name="file">
-        <el-button size="small" type="primary" id="sendAudioBut">点击上传</el-button>
+    <!-- <el-upload class="upload-demo" action="http://127.0.0.1:5000/input_audio"  -->
+    <el-upload class="upload-demo" action="uploadAction"
+    :show-file-list="true"
+    :on-success="handleSuccess" 
+    :before-upload="beforeUpload" 
+    name="file">
+        <el-button id="sendAudioBut" style="width: 5em;" round>
+            <el-icon>
+                <Microphone />
+            </el-icon>
+            <span>上传</span>
+        </el-button>
     </el-upload>
+
 </template>
 
 <script>
+import { Microphone } from '@element-plus/icons-vue';
 export default {
+    data(){
+        return{
+            uploadAction:'',
+        };
+    },
     methods: {
         handleSuccess(response, file, fileList) {
             // 文件上传成功的回调
@@ -20,6 +31,11 @@ export default {
         },
         beforeUpload(file) {
             // 在上传之前的钩子，返回 false 可以取消上传
+            if(file.name.includes('Vad')){
+                this.uploadAction="http://127.0.0.1:5000/input_audio";
+            }else{
+                this.uploadAction="http://127.0.0.1:5000/register_speaker";
+            }
             console.log(file);
             return true;
         },
@@ -31,5 +47,12 @@ export default {
 /* 根据实际情况调整样式 */
 .upload-demo {
     display: inline-block;
+}
+
+#sendAudioBut,.upload-demo {
+    position: relative;
+    z-index: 2;
+    grid-area: 5 / 4 / 6 / 5;
+    transform: translate(113px, 30px);
 }
 </style>

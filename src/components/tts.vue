@@ -11,32 +11,41 @@
     <button @click="speak">朗读</button>
   </div>
   <el-button v-on:click="sendMessage" id="sendMessageBut" style="width: 5em;" round>
-    <el-icon><Edit/></el-icon>
+    <el-icon>
+      <Edit />
+    </el-icon>
     <span>发送</span>
   </el-button>
 </template>
 
 <script>
 import eventBus from '@/eventBus';
-import {Edit, Microphone} from '@element-plus/icons-vue'
+import { Edit } from '@element-plus/icons-vue'
 export default {
-  components:{
+  created() {
+    eventBus.on('tts-event', this.sendTts);
+  },
+  beforeUnmount() {
+    eventBus.off('tts-event', this.sendTts);
+  },
+  components: {
     Edit,
   },
 
   data() {
     return {
-      textInput:'',
+      textInput: '',
       voices: [],
       selectedVoice: null,
     };
   },
-  
+
   mounted() {
     this.populateVoiceList();
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = this.populateVoiceList;
     }
+    
   },
   methods: {
     sendMessage() {
@@ -57,7 +66,17 @@ export default {
       } else {
         alert('请输入要朗读的文本');
       }
-    }
+    },
+    sendTts(message) {
+      if (!message) 
+        return;
+      console.log(message);
+      console.log(typeof message);
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.voice = this.voices[this.selectedVoice];
+      window.speechSynthesis.speak(utterance);
+      console.log("speak successfully");
+    },
   }
 };
 </script>
@@ -100,11 +119,15 @@ select {
 button {
   padding: 5px 10px;
 }
-#sendMessageBut,#sendAudioBut {
-  position:relative;
+
+#sendMessageBut {
+  position: relative;
   z-index: 2;
   grid-area: 5 / 4 / 6 / 5;
   transform: translateX(225px);
 }
-.text-input { grid-area: 2 / 2 / 6 / 5; }
+
+.text-input {
+  grid-area: 2 / 2 / 6 / 5;
+}
 </style>
