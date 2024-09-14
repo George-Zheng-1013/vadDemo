@@ -3,7 +3,7 @@
         <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
             <li v-for="(message, index) in messages" class="infinite-list-item">
                 {{ message.message }}
-                <el-button style="width: 1em; float: right;" id="ttsBut" v-on:click="triggerTTS(message.message)" round>
+                <el-button id="ttsBut" v-on:click="triggerTTS(message.message)" circle>
                     <el-icon>
                         <VideoPlay />
                     </el-icon>
@@ -16,7 +16,7 @@
 <script>
 import eventBus from '@/eventBus'
 import { ElMessage } from 'element-plus'
-import { VideoPlay } from '@element-plus/icons-vue';
+import { VideoPlay } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 const count = ref(0)
 const load = () => {
@@ -26,9 +26,11 @@ export default {
 
     created() {
         eventBus.on('input-event', this.handleCustomEvent);
+        eventBus.on('audio-response', this.response);
     },
     beforeUnmount() {
         eventBus.off('input-event', this.handleCustomEvent);
+        eventBus.off('audio-response', this.response);
     },
     components: {
 
@@ -56,6 +58,9 @@ export default {
             } else {
                 this.messages.push(payload);
             }
+        },
+        response(audioResponse){
+            this.messages.push(audioResponse.text);
         }
     },
 };
@@ -63,29 +68,30 @@ export default {
 
 <style>
 .infinite-list {
-    height: 90%;
+    height: 100%;
     list-style: none;
     padding-left: 0px;
     grid-area: 2 / 2 / 5 / 5;
 }
-
 .infinite-list .infinite-list-item {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     height: 50px;
-    background: var(--el-color-primary-light-9);
+    background: #F1F3F5;
     margin: 10px;
-    color: var(--el-color-primary);
+    color: black;
+    font-size: 16px;
+    font-weight: normal;
     border-radius: 50px;
-}
-
-.infinite-list .infinite-list-item+.list-item {
     margin-top: 10px;
 }
-
-#ttsBut {
+.infinite-list-item {
+    padding-left: 50px;
+    padding-right: 10px;
+}
+/* #ttsBut {
     position: relative;
     transform: translateX(440px);
-}
+} */
 </style>

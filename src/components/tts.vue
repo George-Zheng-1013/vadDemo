@@ -1,6 +1,6 @@
 <template>
   <div class="divTtsBack">
-    <input type="text" v-model="textInput" class="text-input" placeholder="输入要发送的文本"></input>
+    <textarea type="text" v-model="textInput" id="text-input" placeholder="输入要发送的文本"></textarea>
   </div>
   <div class="divTts">
     <select v-model="selectedVoice">
@@ -10,7 +10,7 @@
     </select>
     <button @click="speak">朗读</button>
   </div>
-  <el-button v-on:click="sendMessage" id="sendMessageBut" style="width: 5em;" round>
+  <el-button v-on:click="sendMessage" id="sendMessageBut" style="width: 100px;" color="#0A59F7" round>
     <el-icon>
       <Edit />
     </el-icon>
@@ -84,30 +84,30 @@ export default {
 <style>
 .divTtsBack {
   padding: 12.5px 15px;
-  border: 0;
   border-radius: 40px;
   background-color: white;
   transition: all 0.5s;
   -webkit-transition: all 0.5s;
   margin-bottom: 5px;
-  z-index: 1;
+  width: 100%;
 }
 
-.text-input {
-  position: absolute;
+#text-input {
+  position: relative;
   padding: 12.5px 15px;
   border: 0;
   border-radius: 25px;
   background-color: #E5E7E9;
   transition: all 0.5s;
-  top: 700px;
-  z-index: 2;
-  height: 190px;
-  width: 50%;
+  top: 525px;
+  z-index: 1;
+  height: 150px;
+  width: 100%;
   font-size: 16px;
   font-weight: normal;
   font-family: Arial, Helvetica, sans-serif;
   color: #5C5C5D;
+  resize: none;
 }
 
 select {
@@ -122,9 +122,9 @@ button {
 
 #sendMessageBut {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   grid-area: 5 / 4 / 6 / 5;
-  transform: translateX(225px);
+  transform: translate(200px,70px);
 }
 
 .text-input {
