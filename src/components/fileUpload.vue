@@ -23,34 +23,21 @@ export default {
     data() {
         return {
             uploadAction: "",
+            audioBlob:null,
         };
     },
+    mounted(){
+        eventBus.on('RecordingVad-event',this.handleRecordingFinished);
+    },
     methods: {
-        uploadFile() {
-            const filePath = './src/audioFiles/audioVad.m4a';
-            fetch(filePath)
-                .then(response=>response.blob())
-                .then(blob=>{
-                    // 创建文件对象
-                    const file = new File([blob], 'audioVad.m4a', { type: 'audio/mp4' });
-
-                    // 获取 el-upload 组件实例
-                    const uploadComponent = this.$refs.upload;
-                    this.$nextTick(()=>{
-                        // 创建一个新的 FileList 对象
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(file);
-
-                        // 将 FileList 对象赋值给 el-upload 组件的 input 元素
-                        uploadComponent.$el.querySelector('input[type="file"]').files = dataTransfer.files;
-
-                        // 手动触发上传
-                        uploadComponent.submit();
-                    });
-                })
-                .catch(error=>{
-                    console.error("文件读取失败",error);
-                });
+        handleRecordingFinished(file){
+            this.recordingFile=file;
+            this.uploadFile();
+        },
+        uploadFile(){
+            if(this.recordingFile){
+                this.$refs.upload.submit();
+            }
         },
         handleSuccess(response, file, fileList) {
             // 文件上传成功的回调
@@ -66,7 +53,7 @@ export default {
             }
             console.log(file);
             console.log(this.uploadAction);
-            return true;
+            return this.recordingFile;
         },
     },
 };
