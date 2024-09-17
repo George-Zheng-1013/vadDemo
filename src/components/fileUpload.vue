@@ -5,9 +5,8 @@
     :on-success="handleSuccess"
     :before-upload="beforeUpload" 
     name="file" 
-    ref="upload" 
-    :auto-upload="false">
-        <el-button id="sendAudioBut" style="width: 100px;" v-on:click="uploadFile" color="#0A59F7" round>
+    :auto-upload="true">
+        <el-button id="sendAudioBut" style="width: 100px;" color="#0A59F7" v-on:click="handleButClick" round>
             <el-icon>
                 <Microphone />
             </el-icon>
@@ -23,25 +22,15 @@ export default {
     data() {
         return {
             uploadAction: "",
-            audioBlob:null,
         };
     },
-    mounted(){
-        eventBus.on('RecordingVad-event',this.handleRecordingFinished);
-    },
     methods: {
-        handleRecordingFinished(file){
-            this.recordingFile=file;
-            this.uploadFile();
-        },
-        uploadFile(){
-            if(this.recordingFile){
-                this.$refs.upload.submit();
-            }
+        handleButClick(){
+            eventBus.emit('sendAudioBut-clicked',{message:"已上传音频文件",type:'audioUpload'});
         },
         handleSuccess(response, file, fileList) {
             // 文件上传成功的回调
-            eventBus.emit('audio-response', response);
+            eventBus.emit('audio-response', {message:response.text,type:'response'});
             console.log(response);
         },
         beforeUpload(file) {
@@ -53,7 +42,7 @@ export default {
             }
             console.log(file);
             console.log(this.uploadAction);
-            return this.recordingFile;
+            return true;
         },
     },
 };

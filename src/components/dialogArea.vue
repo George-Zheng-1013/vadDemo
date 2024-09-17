@@ -1,13 +1,19 @@
 <template>
     <div class="diaArea">
         <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
-            <li v-for="(message, index) in messages" class="infinite-list-item">
+            <li v-for="(message, index) in messages" v-bind:key="index" 
+            v-bind:class="{
+                'type-dialog': message.type === 'dialog',
+                'type-audioUpload': message.type === 'audioUpload',
+                'type-response':message.type==='response'}">
                 {{ message.message }}
-                <el-button id="ttsBut" v-on:click="triggerTTS(message.message)" circle>
-                    <el-icon>
-                        <VideoPlay />
-                    </el-icon>
-                </el-button>
+                <template v-if="message.type === 'dialog'">
+                    <el-button id="ttsBut" v-on:click="triggerTTS(message.message)" circle>
+                        <el-icon>
+                            <VideoPlay />
+                        </el-icon>
+                    </el-button>
+                </template>
             </li>
         </ul>
     </div>
@@ -26,10 +32,12 @@ export default {
 
     created() {
         eventBus.on('input-event', this.handleCustomEvent);
+        eventBus.on('sendAudioBut-clicked',this.handleButClick);
         eventBus.on('audio-response', this.response);
     },
     beforeUnmount() {
         eventBus.off('input-event', this.handleCustomEvent);
+        eventBus.off('sendAudioBut-clicked',this.handleButClick);
         eventBus.off('audio-response', this.response);
     },
     components: {
@@ -56,12 +64,16 @@ export default {
                     type: 'warning',
                 });
             } else {
-                this.messages.push(payload);
+                this.messages.push({message:payload.message,type:'dialog'});
             }
         },
+        handleButClick(message1){
+            this.messages.push(message1);
+            console.log(message1);
+        },
         response(audioResponse){
-            this.messages.push(audioResponse.text);
-        }
+            this.messages.push(audioResponse);
+        },
     },
 };
 </script>
@@ -73,12 +85,29 @@ export default {
     padding-left: 0px;
     grid-area: 2 / 2 / 5 / 5;
 }
-.infinite-list .infinite-list-item {
+.infinite-list .type-dialog {
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 50px;
-    background: #F1F3F5;
+    margin: 10px;
+    color: black;
+    font-size: 16px;
+    font-weight: normal;
+    border-radius: 50px;
+    margin-top: 10px;
+
+}
+.type-dialog,.type-audioUpload {
+    padding-left: 50px;
+    padding-right: 10px;
+    background-color: #E6EEFE;
+}
+.type-audioUpload {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
     margin: 10px;
     color: black;
     font-size: 16px;
@@ -86,12 +115,19 @@ export default {
     border-radius: 50px;
     margin-top: 10px;
 }
-.infinite-list-item {
+.type-response {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    margin: 10px;
+    color: black;
+    font-size: 16px;
+    font-weight: normal;
+    border-radius: 50px;
+    margin-top: 10px;
     padding-left: 50px;
     padding-right: 10px;
+    background-color: #F1F3F5;
 }
-/* #ttsBut {
-    position: relative;
-    transform: translateX(440px);
-} */
 </style>

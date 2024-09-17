@@ -2,18 +2,17 @@
     <div class="newRoleAudioPlayerVad" id="audioPlayerBack">
         <p id="inputAudio">对话音频</p>
         <audio ref="audioPlayerVad" controls></audio>
-        <button v-on:click="uploadAudioVad">上传音频</button>
         <a ref="downloadLink" style="display: none;">下载音频</a>
+        <button v-on:click="uploadAudioVad">上传音频</button>
     </div>
 </template>
 
 <script>
 import { ref } from 'vue';
-import eventBus from '@/eventBus'
 export default {
     setup() {
         const audioPlayerVad = ref(null);
-        const downloadLink = ref(null);
+        const downloadLink=ref(null);
         let mediaRecorder;
         let audioChunks = [];
 
@@ -25,7 +24,7 @@ export default {
                 audioChunks.push(event.data);
             };
 
-            mediaRecorder.onstop = async() => {
+            mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
                 const url = URL.createObjectURL(audioBlob);
                 audioPlayerVad.value.src = url;
@@ -34,7 +33,6 @@ export default {
                 downloadLink.value.style.display = 'block';
                 downloadLink.value.textContent = '下载音频';
                 audioChunks = [];
-                eventBus.emit('RecordingVad-event', audioBlob);
             };
 
             mediaRecorder.start();
@@ -46,10 +44,14 @@ export default {
             }
         }
         async function uploadAudioVad() {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
-            const formData = new FormData();
+            const audioBlob = new Blob(audioChunks, { type: 'audio/m4a' });
+            let formData = new FormData();
             formData.append('file', audioBlob, 'audioVad.m4a');
-
+            // Log the details of the file
+            const file = formData.get('file');
+            console.log('File name:', file.name);
+            console.log('File type:', file.type);
+            console.log('File size:', file.size);
             try {
                 const response = await fetch("http://127.0.0.1:5000/input_audio", {
                     method: 'POST',
@@ -64,6 +66,7 @@ export default {
                 console.log('上传成功:', result);
             } catch (error) {
                 console.error('上传失败:', error);
+                console.log(formData);
             }
         }
 
@@ -71,8 +74,8 @@ export default {
             startRecording,
             stopRecording,
             audioPlayerVad,
-            downloadLink,
-            uploadAudioVad
+            uploadAudioVad,
+            downloadLink
         };
     },
 };
