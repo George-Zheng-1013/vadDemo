@@ -10,7 +10,7 @@
                 <template v-if="message.type === 'dialog'">
                     <el-button id="ttsBut" v-on:click="triggerTTS(message.message)" circle>
                         <el-icon>
-                            <VideoPlay />
+                            <VideoPlay/>
                         </el-icon>
                     </el-button>
                 </template>
