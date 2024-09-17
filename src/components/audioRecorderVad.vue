@@ -9,6 +9,7 @@
 
 <script>
 import { ref } from 'vue';
+import axios from 'axios';
 export default {
     setup() {
         const audioPlayerVad = ref(null);
@@ -42,34 +43,52 @@ export default {
             if (mediaRecorder) {
                 mediaRecorder.stop();
             }
-        }
+        }    
         async function uploadAudioVad() {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/m4a' });
+            // const audioBlob = new Blob(audioChunks, { type: 'audio/m4a' });
+            // let formData = new FormData();
+            // formData.append('file', audioBlob, 'audioVad.m4a');
+            // // Log the details of the file
+            // const file = formData.get('file');
+            // console.log('File name:', file.name);
+            // console.log('File type:', file.type);
+            // console.log('File size:', file.size);
+            // try {
+            //     const response = await fetch("http://127.0.0.1:5000/input_audio", {
+            //         method: 'POST',
+            //         body: formData
+            //     });
+            //     if (!response.ok) {
+            //         throw new Error('网络响应不正常');
+            //     }
+            //     const result = await response.json();
+            //     console.log('上传成功:', result);
+            // } catch (error) {
+            //     console.error('上传失败:', error);
+            //     console.log(formData);
+            // }
+            // 获取blob数据
+            let blob = new Blob(audioChunks, { type: 'audio/m4a' });
+
+            // 创建FormData对象
             let formData = new FormData();
-            formData.append('file', audioBlob, 'audioVad.m4a');
-            // Log the details of the file
-            const file = formData.get('file');
-            console.log('File name:', file.name);
-            console.log('File type:', file.type);
-            console.log('File size:', file.size);
-            try {
-                const response = await fetch("http://127.0.0.1:5000/input_audio", {
-                    method: 'POST',
-                    body: formData
-                });
+            formData.append('file', blob, 'audioVad.m4a'); // 第一个参数是后台接收的文件参数名，第二个参数是blob数据，第三个参数是文件名
 
-                if (!response.ok) {
-                    throw new Error('网络响应不正常');
+            // 发送ajax请求
+            axios.post('http://127.0.0.1:5000/input_audio', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
                 }
+            }).then(response => {
+                // 处理响应数据
+                console.log('上传成功');
+                console.log(response);
+            }).catch(error => {
+                // 处理错误
+                console.log('上传失败');
+            });
 
-                const result = await response.json();
-                console.log('上传成功:', result);
-            } catch (error) {
-                console.error('上传失败:', error);
-                console.log(formData);
-            }
         }
-
         return {
             startRecording,
             stopRecording,
@@ -77,7 +96,7 @@ export default {
             uploadAudioVad,
             downloadLink
         };
-    },
+    }
 };
 </script>
 
