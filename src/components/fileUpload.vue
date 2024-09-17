@@ -30,7 +30,7 @@ export default {
         },
         handleSuccess(response, file, fileList) {
             // 文件上传成功的回调
-            eventBus.emit('audio-response', {message:response.text,type:'response'});
+            eventBus.emit('audio-response', {message:response.message,type:'response'});
             console.log(response);
         },
         beforeUpload(file) {
