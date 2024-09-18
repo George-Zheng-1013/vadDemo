@@ -1,13 +1,28 @@
 <template>
     <div class="diaArea">
         <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
-            <li v-for="(message, index) in messages" v-bind:key="index" 
+            <li v-for="(message, index) in messages" 
+            v-bind:key="index" 
             v-bind:class="{
                 'type-dialog': message.type === 'dialog',
                 'type-audioUpload': message.type === 'audioUpload',
                 'type-response':message.type==='response'}">
+                <template v-if="message.type==='dialog' || message.type==='audioUpload'">
+                    <el-button aria-disabled="true" class="userButton" circle>
+                        <el-icon>
+                            <User/>
+                        </el-icon>
+                    </el-button>
+                </template>
+                <template v-if="message.type==='response'">
+                    <el-button aria-disabled="true" class="cpuButton" circle>
+                        <el-icon>
+                            <Cpu/>
+                        </el-icon>
+                    </el-button>
+                </template>
                 {{ message.message }}
-                <template v-if="message.type === 'dialog'">
+                <template v-if="message.type === 'dialog' || message.type==='response'">
                     <el-button id="ttsBut" v-on:click="triggerTTS(message.message)" circle>
                         <el-icon>
                             <VideoPlay/>
@@ -22,7 +37,7 @@
 <script>
 import eventBus from '@/eventBus'
 import { ElMessage } from 'element-plus'
-import { VideoPlay } from '@element-plus/icons-vue'
+import { VideoPlay,User,Cpu } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 const count = ref(0)
 const load = () => {
@@ -99,14 +114,13 @@ export default {
 
 }
 .type-dialog,.type-audioUpload {
-    padding-left: 50px;
+    padding-left: 10px;
     padding-right: 10px;
     background-color: #E6EEFE;
 }
 .type-audioUpload {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     height: 50px;
     margin: 10px;
     color: black;
@@ -114,6 +128,8 @@ export default {
     font-weight: normal;
     border-radius: 50px;
     margin-top: 10px;
+    text-align: center;
+    justify-content: center;
 }
 .type-response {
     display: flex;
@@ -126,8 +142,12 @@ export default {
     font-weight: normal;
     border-radius: 50px;
     margin-top: 10px;
-    padding-left: 50px;
+    padding-left: 10px;
     padding-right: 10px;
     background-color: #F1F3F5;
+    width: 100%;
+}
+.cpuButton {
+    margin-left: 10px;
 }
 </style>
