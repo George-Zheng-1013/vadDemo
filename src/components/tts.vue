@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import eventBus from '@/eventBus';
+import eventBus from '@/eventBus'
 import { Edit } from '@element-plus/icons-vue'
 export default {
   created() {
@@ -62,6 +62,9 @@ export default {
         const msg = new SpeechSynthesisUtterance(this.textInput);
         msg.voice = this.voices[this.selectedVoice];
         msg.lang = this.voices[this.selectedVoice].lang;
+        msg.onend=function(){
+          console.log('朗读结束');
+        };
         window.speechSynthesis.speak(msg);
       } else {
         alert('请输入要朗读的文本');
@@ -74,8 +77,17 @@ export default {
       console.log(typeof message);
       const utterance = new SpeechSynthesisUtterance(message);
       utterance.voice = this.voices[this.selectedVoice];
+      utterance.onstart=function(){
+        console.log('朗读开始');
+        eventBus.emit('tts-end-event');
+      };
+      utterance.onend=function(){
+          console.log('朗读结束');
+          eventBus.emit('tts-start-event');
+      };
       window.speechSynthesis.speak(utterance);
       console.log("speak successfully");
+      eventBus.emit('tts-end-event');
     },
   }
 };

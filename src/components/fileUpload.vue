@@ -49,10 +49,6 @@ export default {
 </script>
 
 <style scoped>
-/* 根据实际情况调整样式 */
-/* .upload-demo {
-    display: inline-block;
-} */
 
 .upload-demo {
     height: 0px;

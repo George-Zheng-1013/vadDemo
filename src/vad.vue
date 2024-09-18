@@ -1,18 +1,26 @@
 <template>
     <div class="div2">
         <p id="realtimeVad">实时说话检测</p>
-        <button @click="startVAD" class="vadButton" id="startVadButton">开始说话检测</button>
-        <button @click="pauseVAD" class="vadButton" id="pauseVadButton">停止说话检测</button>
+        <button @click="startVAD" class="vadButton" id="startVadButton" ref="startVadButton">开始说话检测</button>
+        <button @click="pauseVAD" class="vadButton" id="pauseVadButton" ref="pauseVadButton">停止说话检测</button>
     </div>
     <audio-recorder ref="audioRecorderRef"></audio-recorder>
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
-import audioRecorder from './components/audioRecorderVad.vue';
+import { onMounted, ref } from 'vue'
+import audioRecorder from './components/audioRecorderVad.vue'
+import eventBus from '@/eventBus'
 
 export default {
-    
+    created() {
+        eventBus.on('tts-start-event', this.startTts);
+        eventBus.on('tts-end-event', this.endTts);
+    },
+    beforeUnmount() {
+        eventBus.off('tts-start-event', this.startTts);
+        eventBus.off('tts-end-event', this.endTts);
+    },
     components: {
         audioRecorder,
     },
@@ -64,6 +72,14 @@ export default {
             isPaused,          
         };
     }, 
+    methods:{
+        startTts(){
+            this.$refs.startVadButton.click();
+        },
+        endTts(){
+            this.$refs.pauseVadButton.click();
+        }
+    }
 }
 </script>
 
