@@ -10,12 +10,13 @@
         <p id="newRoleAudio">新建说话人音频</p>
         <audio ref="audioPlayer" controls></audio>
         <a ref="downloadLink" style="display: none;">下载音频</a>
+        <button v-on:click="uploadAudio">上传说话人音频</button>
     </div>
 </template>
 
 <script>
 import { ref } from 'vue';
-
+import axios from 'axios';
 export default {
     setup() {
         const audioPlayer = ref(null);
@@ -39,7 +40,6 @@ export default {
                 downloadLink.value.download = 'audio.m4a';
                 downloadLink.value.style.display = 'block';
                 downloadLink.value.textContent = '下载音频';
-                audioChunks = [];
             };
 
             mediaRecorder.start();
@@ -50,12 +50,42 @@ export default {
                 mediaRecorder.stop();
             }
         }
+        const uploadAudio=async()=> {
+            let formData;
+            try {
+                // 获取blob数据
+                let blob = new Blob(audioChunks, { type: 'audio/mp4' });
+
+                // 创建FormData对象
+                formData = new FormData();
+                formData.append('file', blob, 'audio.m4a'); // 第一个参数是后台接收的文件参数名，第二个参数是blob数据，第三个参数是文件名
+                // 打印FormData内容
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}: ${value.name}, ${value.type}`);
+                }
+                // 发送ajax请求
+                const response = await axios.post('http://127.0.0.1:5000/register_speaker', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                audioChunks = [];
+                // 处理响应数据
+                console.log('上传成功');
+                console.log(response.data);
+            } catch (error) {
+                // 处理错误
+                console.error('上传失败:', error);
+                console.log(formData);
+            }
+        };
 
         return {
             startRecording,
             stopRecording,
             audioPlayer,
-            downloadLink
+            downloadLink,
+            uploadAudio
         };
     },
 };

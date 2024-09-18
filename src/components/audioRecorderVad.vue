@@ -3,7 +3,7 @@
         <p id="inputAudio">对话音频</p>
         <audio ref="audioPlayerVad" controls></audio>
         <a ref="downloadLink" style="display: none;">下载音频</a>
-        <button v-on:click="uploadAudioVad">上传音频</button>
+        <button v-on:click="uploadAudioVad">上传对话音频</button>
     </div>
 </template>
 
@@ -44,52 +44,7 @@ export default {
                 mediaRecorder.stop();
             }
         }    
-        // async function uploadAudioVad() {
-        //     // const audioBlob = new Blob(audioChunks, { type: 'audio/m4a' });
-        //     // let formData = new FormData();
-        //     // formData.append('file', audioBlob, 'audioVad.m4a');
-        //     // // Log the details of the file
-        //     // const file = formData.get('file');
-        //     // console.log('File name:', file.name);
-        //     // console.log('File type:', file.type);
-        //     // console.log('File size:', file.size);
-        //     // try {
-        //     //     const response = await fetch("http://127.0.0.1:5000/input_audio", {
-        //     //         method: 'POST',
-        //     //         body: formData
-        //     //     });
-        //     //     if (!response.ok) {
-        //     //         throw new Error('网络响应不正常');
-        //     //     }
-        //     //     const result = await response.json();
-        //     //     console.log('上传成功:', result);
-        //     // } catch (error) {
-        //     //     console.error('上传失败:', error);
-        //     //     console.log(formData);
-        //     // }
-        //     // 获取blob数据
-        //     let blob = new Blob(audioChunks, { type: 'audio/m4a' });
-
-        //     // 创建FormData对象
-        //     let formData = new FormData();
-        //     formData.append('file', blob, 'audioVad.m4a'); // 第一个参数是后台接收的文件参数名，第二个参数是blob数据，第三个参数是文件名
-        //     // 发送ajax请求
-        //     axios.post('http://127.0.0.1:5000/input_audio', formData, {
-        //         headers: {
-        //             'Content-Type': 'multipart/form-data'
-        //         },
-        //         data:formData
-        //     }).then(response => {
-        //         // 处理响应数据
-        //         console.log('上传成功');
-        //         console.log(response);
-        //     }).catch(error => {
-        //         // 处理错误
-        //         console.log('上传失败');
-        //         console.log(formData);
-        //     });
-
-        // }
+        
         const uploadAudioVad=async()=> {
             let formData;
             try {
