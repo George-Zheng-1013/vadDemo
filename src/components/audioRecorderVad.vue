@@ -19,14 +19,14 @@ export default {
 
         async function startRecording() {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/m4a' });
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mp4' });
 
             mediaRecorder.ondataavailable = (event) => {
                 audioChunks.push(event.data);
             };
 
             mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/m4a' });
+                const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
                 const url = URL.createObjectURL(audioBlob);
                 audioPlayerVad.value.src = url;
                 downloadLink.value.href = url;
