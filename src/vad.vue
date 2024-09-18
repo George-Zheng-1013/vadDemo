@@ -61,9 +61,8 @@ export default {
                 onSpeechEnd: (audio) => {
                     console.log("语音结束");
                     setTimeout(stopRecord,500);
-                    eventBus.emit('dialogEnded-event');
                     myvad.pause();
-
+                    eventBus.emit('dialogEnded-event');
                 },
             });
             myvad.start();
