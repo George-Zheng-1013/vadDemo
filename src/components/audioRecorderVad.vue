@@ -3,7 +3,7 @@
         <p id="inputAudio">对话音频</p>
         <audio ref="audioPlayerVad" controls></audio>
         <a ref="downloadLink" style="display: none;">下载音频</a>
-        <button v-on:click="uploadAudioVad">上传对话音频</button>
+        <button v-on:click="uploadAudioVad" ref="uploadAudioVad1">上传对话音频</button>
     </div>
 </template>
 
@@ -12,6 +12,12 @@ import { ref } from 'vue'
 import axios from 'axios'
 import eventBus from '@/eventBus'
 export default {
+    created(){
+        eventBus.on('dialogEnded-event',this.dialogEnd);
+    },
+    beforeUnmount(){
+        eventBus.off('dialogEnded-event',this.dialogEnd);
+    },
     setup() {
         const audioPlayerVad = ref(null);
         const downloadLink=ref(null);
@@ -85,6 +91,11 @@ export default {
             uploadAudioVad,
             downloadLink,
         };
+    },
+    methods:{
+        dialogEnd(){
+            this.$refs.uploadAudioVad1.click();
+        }
     },
 
 };

@@ -16,10 +16,12 @@ export default {
     created() {
         eventBus.on('tts-start-event', this.startTts);
         eventBus.on('tts-end-event', this.endTts);
+        eventBus.on('audio-response',this.response);
     },
     beforeUnmount() {
         eventBus.off('tts-start-event', this.startTts);
         eventBus.off('tts-end-event', this.endTts);
+        eventBus.off('audio-response',this.response);
     },
     components: {
         audioRecorder,
@@ -48,19 +50,22 @@ export default {
                     }else{
                         audioRecorderRef.value.startRecording();
                         console.log("开始录音");
+                        if(isPaused.value){
+                            myvad.pause();
+                            console.log("已暂停");
+                            isPaused.value=false;
+                            stopRecord();
+                        }
                     }
                 },
                 onSpeechEnd: (audio) => {
                     console.log("语音结束");
                     setTimeout(stopRecord,500);
-                    if(isPaused.value){
-                        myvad.pause();
-                        console.log("已暂停");
-                        isPaused.value=false;
-                    }
+                    eventBus.emit('dialogEnded-event');
+                    myvad.pause();
+
                 },
             });
-
             myvad.start();
 
         }
@@ -73,6 +78,9 @@ export default {
         };
     }, 
     methods:{
+        response(){
+            this.$refs.startVadButton.click();
+        },
         startTts(){
             this.$refs.startVadButton.click();
         },
