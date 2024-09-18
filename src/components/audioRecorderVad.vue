@@ -33,7 +33,7 @@ export default {
                 downloadLink.value.download = 'audioVad.m4a';
                 downloadLink.value.style.display = 'block';
                 downloadLink.value.textContent = '下载音频';
-                audioChunks = [];
+                
             };
 
             mediaRecorder.start();
@@ -94,7 +94,7 @@ export default {
             let formData;
             try {
                 // 获取blob数据
-                let blob = new Blob(audioChunks, { type: 'audio/m4a' });
+                let blob = new Blob(audioChunks, { type: 'audio/mp4' });
 
                 // 创建FormData对象
                 formData = new FormData();
@@ -109,6 +109,7 @@ export default {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
+                audioChunks = [];
                 // 处理响应数据
                 console.log('上传成功');
                 console.log(response.data);
