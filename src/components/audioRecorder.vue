@@ -73,6 +73,7 @@ export default {
                 // 处理响应数据
                 console.log('上传成功');
                 console.log(response.data);
+                eventBus.emit('sendAudioBut-clicked',{message:"已上传说话人音频",type:'audioUpload'});
             } catch (error) {
                 // 处理错误
                 console.error('上传失败:', error);

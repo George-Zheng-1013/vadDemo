@@ -10,6 +10,7 @@
 <script>
 import { ref } from 'vue'
 import axios from 'axios'
+import eventBus from '@/eventBus'
 export default {
     setup() {
         const audioPlayerVad = ref(null);
@@ -68,6 +69,8 @@ export default {
                 // 处理响应数据
                 console.log('上传成功');
                 console.log(response.data);
+                eventBus.emit('sendAudioBut-clicked',{message:"已上传对话音频",type:'audioUpload'});
+                eventBus.emit('audio-response', {message:response.message,type:'response'});
             } catch (error) {
                 // 处理错误
                 console.error('上传失败:', error);
