@@ -16,6 +16,7 @@ export default {
     created() {
         eventBus.on('tts-start-event', this.startTts);
         eventBus.on('tts-end-event', this.endTts);
+        eventBus.on('response-shown-event',this.startTts);
     },
     beforeUnmount() {
         eventBus.off('tts-start-event', this.startTts);
@@ -58,11 +59,9 @@ export default {
                 },
                 onSpeechEnd: (audio) => {
                     console.log("语音结束");
-                    if(isPaused.value){
-                        myvad.pause();
-                        console.log("已暂停");
-                        isPaused.value=false;
-                    }
+                    myvad.pause();
+                    console.log("已暂停");
+                    isPaused.value=false;
                     stopRecord();
                 },
             });
