@@ -60,13 +60,21 @@ export default {
                 },
                 onSpeechEnd: (audio) => {
                     console.log("语音结束");
+<<<<<<< Updated upstream
                     stopRecord();
                     myvad.pause();
                     eventBus.emit('dialogEnded-event');
+=======
+                    if(isPaused.value){
+                        myvad.pause();
+                        console.log("已暂停");
+                        isPaused.value=false;
+                    }
+                    stopRecord();
+>>>>>>> Stashed changes
                 },
             });
             myvad.start();
-
         }
 
         return {
