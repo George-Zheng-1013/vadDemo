@@ -6,7 +6,8 @@
             v-bind:class="{
                 'type-dialog': message.type === 'dialog',
                 'type-audioUpload': message.type === 'audioUpload',
-                'type-response':message.type==='response'}">
+                'type-response':message.type==='response'}"
+            class="li">
                 <template v-if="message.type==='dialog' || message.type==='audioUpload'">
                     <el-button aria-disabled="true" class="userButton" circle>
                         <el-icon>
@@ -21,7 +22,9 @@
                         </el-icon>
                     </el-button>
                 </template>
-                <p class="message">{{ message.message }}</p>
+                <div class="divMessage">
+                    {{ message.message }}
+                </div>
                 <template v-if="message.type === 'dialog' || message.type==='response'">
                     <el-button id="ttsBut" v-on:click="triggerTTS(message.message)" circle>
                         <el-icon>
@@ -104,18 +107,18 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 50px;
+    /* height: 50px; */
     margin: 10px;
     color: black;
     font-size: 16px;
     font-weight: normal;
-    border-radius: 50px;
+    border-radius:25px;
     margin-top: 10px;
 
 }
 .type-dialog,.type-audioUpload {
     padding-left: 10px;
-    padding-right: 10px;
+    padding-right: 15px;
     background-color: #E6EEFE;
 }
 .type-audioUpload {
@@ -135,21 +138,28 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 50px;
+    /* height: 50px; */
     margin: 10px;
     color: black;
     font-size: 16px;
     font-weight: normal;
-    border-radius: 50px;
+    border-radius: 25px;
     margin-top: 10px;
     padding-left: 10px;
-    padding-right: 10px;
+    padding-right: 15px;
     background-color: #F1F3F5;
 }
 .cpuButton {
     margin-left: 10px;
 }
-.message {
+.divMessage {
     word-wrap: break-word;
+    height: 100%;
+    width: 90%;
+    flex: 1;
+}
+.type-dialog, .type-response {
+    display: flex;
+    align-items: stretch;
 }
 </style>
