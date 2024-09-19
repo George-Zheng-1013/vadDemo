@@ -52,7 +52,7 @@ export default {
                 },
                 onSpeechEnd: (audio) => {
                     console.log("语音结束");
-                    setTimeout(stopRecord,500);
+                    stopRecord();
                     if(isPaused.value){
                         myvad.pause();
                         console.log("已暂停");
