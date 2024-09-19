@@ -91,6 +91,7 @@ export default {
         },
         response(audioResponse){
             this.messages.push(audioResponse);
+            eventBus.emit('response-shown-event');
         },
     },
 };
