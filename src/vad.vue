@@ -52,17 +52,33 @@ export default {
                 },
                 onSpeechEnd: (audio) => {
                     console.log("语音结束");
-                    stopRecord();
                     if(isPaused.value){
                         myvad.pause();
                         console.log("已暂停");
                         isPaused.value=false;
                     }
+                    stopRecord();
+                    const wavBuffer = vad.utils.encodeWAV(audio);
+                    const blob = new Blob([wavBuffer], { type: 'audio/mp4' });
+                    console.log(blob.size);
+                    const formData = new FormData();
+                    formData.append('file', blob, 'audio.m4a');
+                    fetch('http://127.0.0.1:5000/input_audio', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('上传成功:', data);
+                        eventBus.emit('sendAudioBut-clicked',{message:"已上传对话音频",type:'audioUpload'});
+                        eventBus.emit('audio-response', {message:data.text,type:'response'});
+                    })
+                    .catch(error => {
+                        console.error('上传失败:', error);
+                    });
                 },
             });
-
             myvad.start();
-
         }
 
         return {
