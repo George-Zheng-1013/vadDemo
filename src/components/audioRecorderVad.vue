@@ -76,7 +76,7 @@ export default {
                 console.log('上传成功');
                 console.log(response.data);
                 eventBus.emit('sendAudioBut-clicked',{message:"已上传对话音频",type:'audioUpload'});
-                eventBus.emit('audio-response', {message:response.text,type:'response'});
+                eventBus.emit('audio-response', {message:response.data.text,type:'response'});
             } catch (error) {
                 // 处理错误
                 console.error('上传失败:', error);
@@ -93,9 +93,7 @@ export default {
         };
     },
     methods:{
-        dialogEnd(){
-            this.$refs.uploadAudioVad1.click();
-        }
+
     },
 
 };
