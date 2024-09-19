@@ -21,7 +21,7 @@
                         </el-icon>
                     </el-button>
                 </template>
-                {{ message.message }}
+                <p class="message">{{ message.message }}</p>
                 <template v-if="message.type === 'dialog' || message.type==='response'">
                     <el-button id="ttsBut" v-on:click="triggerTTS(message.message)" circle>
                         <el-icon>
@@ -145,9 +145,11 @@ export default {
     padding-left: 10px;
     padding-right: 10px;
     background-color: #F1F3F5;
-    width: 100%;
 }
 .cpuButton {
     margin-left: 10px;
+}
+.message {
+    word-wrap: break-word;
 }
 </style>
