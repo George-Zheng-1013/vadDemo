@@ -40,6 +40,11 @@ export default {
             console.log("已开始说话检测");
             
             const myvad = await vad.MicVAD.new({
+                positiveSpeechThreshold: 0.5,
+                negativeSpeechThreshold: 0.5 - 0.15,
+                preSpeechPadFrames: 1,
+                redemptionFrames: 8,
+                minSpeechFrames: 3,
                 onSpeechStart: () => {
                     console.log("语音开始");
                     if(isPaused.value){
