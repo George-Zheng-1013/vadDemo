@@ -5,99 +5,227 @@
         <button @click="pauseVAD" class="vadButton" id="pauseVadButton" ref="pauseVadButton">停止说话检测</button>
     </div>
     <audio-recorder ref="audioRecorderRef"></audio-recorder>
+    <!-- 添加 Canvas 用于音频可视化 -->
+    <canvas ref="canvas" class="audio-visualizer"></canvas>
 </template>
 
 <script>
-import { onMounted, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
 import audioRecorder from './components/audioRecorderVad.vue'
 import eventBus from '@/eventBus'
 
 export default {
-    created() {
-        eventBus.on('tts-start-event', this.startTts);
-        eventBus.on('tts-end-event', this.endTts);
-        eventBus.on('response-shown-event',this.startTts);
-    },
-    beforeUnmount() {
-        eventBus.off('tts-start-event', this.startTts);
-        eventBus.off('tts-end-event', this.endTts);
-    },
     components: {
         audioRecorder,
     },
     setup() {
-        const audioRecorderRef = ref(null);
-        const isPaused = ref(false);
+        const audioRecorderRef = ref(null)
+        const myvad = ref(null)
+        const canvasRef = ref(null)
+
+        let audioContext = null
+        let analyser = null
+        let dataArray = null
+        let animationId = null
+        let source = null
+
+        // 调试用：确保 canvasRef 在挂载后被正确引用
+        onMounted(() => {
+            console.log('Canvas Ref onMounted:', canvasRef.value)
+        })
+
         function stopRecord() {
-            audioRecorderRef.value.stopRecording();
-            console.log("录音结束");
+            if (audioRecorderRef.value) {
+                audioRecorderRef.value.stopRecording()
+                console.log("录音结束")
+            }
+            stopVisualizer() // 停止可视化
         }
-        function pauseVAD(){
-            console.log("pausedButton has been clicked");
-            isPaused.value = true;
-        }
+
         async function startVAD() {
-            console.log("已开始说话检测");
-            
-            const myvad = await vad.MicVAD.new({
-                positiveSpeechThreshold: 0.5,
-                negativeSpeechThreshold: 0.5 - 0.15,
-                preSpeechPadFrames: 1,
-                redemptionFrames: 8,
-                minSpeechFrames: 3,
-                onSpeechStart: () => {
-                    console.log("语音开始");
-                    if(isPaused.value){
-                        myvad.pause();
-                        console.log("已暂停");
-                        isPaused.value=false;
-                    }else{
-                        audioRecorderRef.value.startRecording();
-                        console.log("开始录音");
+            if (myvad.value) {
+                console.warn("VAD 已经在运行")
+                return
+            }
+            console.log("已开始说话检测")
+            try {
+                myvad.value = await vad.MicVAD.new({
+                    positiveSpeechThreshold: 0.5,
+                    negativeSpeechThreshold: 0.35, // 0.5 - 0.15
+                    preSpeechPadFrames: 1,
+                    redemptionFrames: 8,
+                    minSpeechFrames: 3,
+                    onSpeechStart: () => {
+                        console.log("语音开始")
+                        if (audioRecorderRef.value) {
+                            audioRecorderRef.value.startRecording()
+                            console.log("开始录音")
+                        }
+                        startVisualizer() // 开始可视化
+                    },
+                    onSpeechEnd: (audio) => {
+                        console.log("语音结束")
+                        console.log("已暂停")
+                        stopRecord()
+                        const wavBuffer = vad.utils.encodeWAV(audio)
+                        const blob = new Blob([wavBuffer], { type: 'audio/mp4' })
+                        console.log(blob.size)
+                        const formData = new FormData()
+                        formData.append('file', blob, 'audio.m4a')
+                        fetch('http://127.0.0.1:5000/input_audio', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('上传成功:', data)
+                            eventBus.emit('sendAudioBut-clicked', { message: "已上传对话音频", type: 'audioUpload' })
+                            eventBus.emit('audio-response', { message: data.text, type: 'response' })
+                        })
+                        .catch(error => {
+                            console.error('上传失败:', error)
+                        })
+                    },
+                })
+                myvad.value.start()
+            } catch (error) {
+                console.error("初始化 VAD 失败:", error)
+            }
+        }
+
+        function pauseVAD(){
+            if (myvad.value) {
+                console.log("pausedButton has been clicked")
+                myvad.value.pause()
+                myvad.value.listening = false
+                myvad.value = null // 清除 myvad 引用
+                stopVisualizer() // 停止可视化
+            } else {
+                console.warn("VAD 尚未初始化或已停止")
+            }
+        }
+
+        // 音频可视化相关函数
+        function startVisualizer() {
+            if (!canvasRef.value) {
+                console.error("Canvas 元素未找到")
+                return
+            }
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)()
+            analyser = audioContext.createAnalyser()
+            analyser.fftSize = 2048
+            const bufferLength = analyser.fftSize
+            dataArray = new Uint8Array(bufferLength)
+
+            navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+                .then(stream => {
+                    source = audioContext.createMediaStreamSource(stream)
+                    source.connect(analyser)
+                    draw()
+                })
+                .catch(err => {
+                    console.error('获取音频流失败:', err)
+                })
+        }
+
+        function stopVisualizer() {
+            if (animationId) {
+                cancelAnimationFrame(animationId)
+            }
+            if (source) {
+                source.disconnect()
+                source = null
+            }
+            if (analyser) {
+                analyser.disconnect()
+                analyser = null
+            }
+            if (audioContext) {
+                audioContext.close()
+                audioContext = null
+            }
+            const canvas = canvasRef.value
+            if (canvas) {
+                const canvasCtx = canvas.getContext('2d')
+                canvasCtx.clearRect(0, 0, canvas.width, canvas.height)
+            }
+        }
+
+        function draw() {
+            const canvas = canvasRef.value
+            if (!canvas) return
+            const canvasCtx = canvas.getContext('2d')
+            const WIDTH = canvas.width
+            const HEIGHT = canvas.height
+
+            function drawLoop() {
+                animationId = requestAnimationFrame(drawLoop)
+
+                analyser.getByteTimeDomainData(dataArray)
+
+                canvasCtx.fillStyle = '#f5f5f5'
+                canvasCtx.fillRect(0, 0, WIDTH, HEIGHT)
+
+                canvasCtx.lineWidth = 2
+                canvasCtx.strokeStyle = '#0A59F7'
+
+                canvasCtx.beginPath()
+
+                let sliceWidth = WIDTH * 1.0 / analyser.fftSize
+                let x = 0
+
+                for(let i = 0; i < analyser.fftSize; i++) {
+                    let v = dataArray[i] / 128.0
+                    let y = v * HEIGHT / 2
+
+                    if(i === 0) {
+                        canvasCtx.moveTo(x, y)
+                    } else {
+                        canvasCtx.lineTo(x, y)
                     }
-                },
-                onSpeechEnd: (audio) => {
-                    console.log("语音结束");
-                    myvad.pause();
-                    console.log("已暂停");
-                    isPaused.value=false;
-                    stopRecord();
-                    const wavBuffer = vad.utils.encodeWAV(audio);
-                    const blob = new Blob([wavBuffer], { type: 'audio/mp4' });
-                    console.log(blob.size);
-                    const formData = new FormData();
-                    formData.append('file', blob, 'audio.m4a');
-                    fetch('http://127.0.0.1:5000/input_audio', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('上传成功:', data);
-                        eventBus.emit('sendAudioBut-clicked',{message:"已上传对话音频",type:'audioUpload'});
-                        eventBus.emit('audio-response', {message:data.text,type:'response'});
-                    })
-                    .catch(error => {
-                        console.error('上传失败:', error);
-                    });
-                },
-            });
-            myvad.start();
+
+                    x += sliceWidth
+                }
+
+                canvasCtx.lineTo(canvas.width, canvas.height / 2)
+                canvasCtx.stroke()
+            }
+
+            drawLoop()
+        }
+
+        // 组件挂载时注册事件
+        onMounted(() => {
+            eventBus.on('tts-start-event', startTts)
+            eventBus.on('tts-end-event', endTts)
+            eventBus.on('response-shown-event', startTts)
+        })
+
+        // 组件卸载前清理
+        onBeforeUnmount(() => {
+            eventBus.off('tts-start-event', startTts)
+            eventBus.off('tts-end-event', endTts)
+            eventBus.off('response-shown-event', startTts)
+            stopVisualizer()
+        })
+
+        // 定义 TTS 相关函数
+        function startTts() {
+            setTimeout(() => {
+                startVAD()
+            }, 500)
+        }
+
+        function endTts() {
+            pauseVAD()
         }
 
         return {
             startVAD,
-            audioRecorderRef,
             pauseVAD,
-            isPaused,          
-        };
-    }, 
-    methods:{
-        startTts(){
-            this.$refs.startVadButton.click();
-        },
-        endTts(){
-            this.$refs.pauseVadButton.click();
+            audioRecorderRef,
+            canvasRef,
         }
     }
 }
@@ -117,8 +245,8 @@ export default {
     width: 100%;
 }
 #startVadButton {
-        margin-bottom: 5px;
-    }
+    margin-bottom: 5px;
+}
 
 .div2 {
     padding: 12.5px 15px;
@@ -146,56 +274,69 @@ export default {
     text-align: center;
 }
 #startVadButton {
-  padding: 12.5px 15px;
-  border: 0;
-  border-radius: 100px;
-  background-color: #64BB5C;
-  color: #ffffff;
-  font-weight: Bold;
-  transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  font-size: 24px;
-  margin-bottom: 5px;
-  width: 100%;
+    padding: 12.5px 15px;
+    border: 0;
+    border-radius: 100px;
+    background-color: #64BB5C;
+    color: #ffffff;
+    font-weight: Bold;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    font-size: 24px;
+    margin-bottom: 5px;
+    width: 100%;
 }
 
 #startVadButton:hover {
-  background-color: #64BB5C;opacity: 0.6;
-  box-shadow: 0 0 20px #64BB5C;opacity: 0.6;
-  transform: scale(0.9);
+    background-color: #64BB5C;
+    opacity: 0.6;
+    box-shadow: 0 0 20px #64BB5C;
+    transform: scale(0.9);
 }
 
 #startVadButton:active {
-  background-color: #64BB5C;opacity: 0.4;
-  transition: all 0.25s;
-  -webkit-transition: all 0.25s;
-  box-shadow: none;
-  transform: scale(0.98);
+    background-color: #64BB5C;
+    opacity: 0.4;
+    transition: all 0.25s;
+    -webkit-transition: all 0.25s;
+    box-shadow: none;
+    transform: scale(0.98);
 }
 #pauseVadButton {
-  padding: 12.5px 15px;
-  border: 0;
-  border-radius: 100px;
-  background-color: #ED6F21;
-  color: #ffffff;
-  font-weight: Bold;
-  transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  font-size: 24px;
-  width: 100%;
+    padding: 12.5px 15px;
+    border: 0;
+    border-radius: 100px;
+    background-color: #ED6F21;
+    color: #ffffff;
+    font-weight: Bold;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    font-size: 24px;
+    width: 100%;
 }
 
 #pauseVadButton:hover {
-  background-color: #ED6F21;opacity: 0.6;
-  box-shadow: 0 0 20px #ED6F21;opacity: 0.6;
-  transform: scale(0.9);
+    background-color: #ED6F21;
+    opacity: 0.6;
+    box-shadow: 0 0 20px #ED6F21;
+    transform: scale(0.9);
 }
 
 #pauseVadButton:active {
-  background-color: #ED6F21;opacity: 0.4;
-  transition: all 0.25s;
-  -webkit-transition: all 0.25s;
-  box-shadow: none;
-  transform: scale(0.98);
+    background-color: #ED6F21;
+    opacity: 0.4;
+    transition: all 0.25s;
+    -webkit-transition: all 0.25s;
+    box-shadow: none;
+    transform: scale(0.98);
+}
+
+/* 新增 Canvas 样式 */
+.audio-visualizer {
+    width: 100%;
+    height: 200px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    margin-top: 20px;
 }
 </style>

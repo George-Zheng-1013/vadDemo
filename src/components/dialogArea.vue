@@ -1,6 +1,6 @@
 <template>
     <div class="diaArea">
-        <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
+        <transition-group name="list" tag="ul" v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
             <li v-for="(message, index) in messages" 
             v-bind:key="index" 
             v-bind:class="{
@@ -33,7 +33,7 @@
                     </el-button>
                 </template>
             </li>
-        </ul>
+        </transition-group>
     </div>
 </template>
 
@@ -115,12 +115,12 @@ export default {
     font-weight: normal;
     border-radius:25px;
     margin-top: 10px;
-
 }
 .type-dialog,.type-audioUpload {
     padding-left: 10px;
     padding-right: 15px;
     background-color: #E6EEFE;
+    min-height: 52px;
 }
 .type-audioUpload {
     display: flex;
@@ -139,7 +139,6 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* height: 50px; */
     margin: 10px;
     color: black;
     font-size: 16px;
@@ -149,18 +148,27 @@ export default {
     padding-left: 10px;
     padding-right: 15px;
     background-color: #F1F3F5;
+    min-height: 52px;
 }
-.cpuButton {
+/* .cpuButton {
     margin-left: 10px;
-}
+} */
 .divMessage {
     word-wrap: break-word;
     height: 100%;
     width: 90%;
     flex: 1;
+    padding: 8px
 }
 .type-dialog, .type-response {
     display: flex;
     align-items: stretch;
+}
+.list-enter-active, .list-leave-active {
+    transition: all 1s;
+}
+.list-enter, .list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
 }
 </style>

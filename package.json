@@ -14,8 +14,10 @@
     "element-plus": "^2.8.2",
     "mitt": "^3.0.1",
     "speak-tts": "^2.0.8",
+    "uuid": "^10.0.0",
     "vue": "^3.4.29",
-    "vue-audio-visual": "^3.0.8"
+    "vue-audio-visual": "^3.0.8",
+    "wavesurfer.js": "^7.8.7"
   },
   "devDependencies": {
     "@vitejs/plugin-legacy": "^5.4.2",

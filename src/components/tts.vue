@@ -2,14 +2,6 @@
   <div class="divTtsBack">
     <textarea type="text" v-model="textInput" id="text-input" placeholder="输入要发送的文本"></textarea>
   </div>
-  <!-- <div class="divTts">
-    <select v-model="selectedVoice">
-      <option v-for="(voice, index) in voices" :key="index" :value="index">
-        {{ voice.name }} ({{ voice.lang }})
-      </option>
-    </select>
-    <button @click="speak">朗读</button>
-  </div> -->
   <el-button v-on:click="sendMessage" id="sendMessageBut" style="width: 100px;" color="#0A59F7" round>
     <el-icon>
       <Edit />
